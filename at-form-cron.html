@@ -1,0 +1,214 @@
+<link rel="import" href="../tangere/tangere.html">
+<link rel="import" href="../jquery2-import/jquery2-import.html">
+<link rel="import" href="../at-i18n/at-i18n-behavior.html">
+<link rel="import" href="../at-form-behaviors/at-form-behaviors.html">
+<link rel="import" href="styles/jqcron-styles.html">
+
+<script src="scripts/jqCron.js" charset="utf-8"></script>
+<script src="scripts/jqCron.en.js" charset="utf-8"></script>
+
+<dom-module id="at-form-cron">
+  <template>
+    <style include="at-form-common"></style>
+    <style include="jqcron-styles"></style>
+    <style>
+      :host {
+        @apply(--at-form-host);
+      }
+
+      :host * {
+        box-sizing: border-box;
+      }
+
+      .at-content-container {
+        padding: 6px 0 0 0;
+      }
+    </style>
+
+    <div id="atContainer" class="at-container">
+      <iron-label id="label" for="input">{{label}}</iron-label>
+      <div id="contentContainer" class="at-content-container"></div>
+      <div id="hint"></div>
+    </div>
+  </template>
+  <script>
+    'use strict';
+    Polymer({
+      is: 'at-form-cron',
+      behaviors: [Tangere.behaviors.i18n, Tangere.behaviors.formUIGeneric],
+      properties: {
+        /**
+         * Element's label for element display purposes
+         * @property label
+         * @type String
+         * @default ""
+         */
+        label: {
+          type: String,
+          value: '',
+          title: 'Label'
+        },
+
+        /**
+         * When true label is hidden
+         * @property hideLabel
+         * @type Boolean
+         * @default false
+         */
+        hideLabel: {
+          type: Boolean,
+          value: false,
+          observer: '_hideLabelChanged',
+          title: 'Do not show the label'
+        },
+
+        /**
+         * Element's disabled state
+         * @property disabled
+         * @type Boolean
+         * @default false
+         */
+        disabled: {
+          type: Boolean,
+          value: false,
+          observer: '_disabledChanged',
+          title: 'Field value can not be changed'
+        },
+
+        /**
+         * Hides the element. When hidden nothing is displayed for the element
+         * @property hide
+         * @type Boolean
+         * @default false
+         */
+        hide: {
+          type: Boolean,
+          value: false,
+          observer: '_hideChanged',
+          title: 'Element is hidden'
+        },
+
+        /**
+         * Element's required state for element validation purposes
+         * @property required
+         * @type Boolean
+         * @default false
+         */
+        required: {
+          type: Boolean,
+          value: false,
+          title: 'Input required'
+        },
+
+        /**
+         * Elements value
+         * @property value
+         * @type String
+         * @default ''
+         */
+        value: {
+          type: String,
+          value: '',
+          observer: '_valueChanged',
+          title: 'Value'
+        }
+      },
+
+      observers: [
+        '_internalValidStateUpdate(required)'
+      ],
+
+      $meta: [{
+        title: 'Cron',
+        type: 'string',
+        xtype: 'cron'
+      }],
+
+      _hideLabelChanged: function(newValue, oldValue) {
+        this.toggleClass('hidden', newValue, this.$.label);
+      },
+
+      _disabledChanged: function(newValue, oldValue) {
+        this.toggleClass('disabled', newValue, this.$.atContainer);
+        if (this._cronInstance) {
+          var result = newValue ? this._cronInstance.disable() : this._cronInstance.enable();
+        }
+      },
+
+      _hideChanged: function(newValue, oldValue) {
+        this.toggleClass('hidden', newValue, this.$.atContainer);
+      },
+
+      ready: function() {
+        var cronContainer = this.$.contentContainer;
+        var $cronContainer = $(cronContainer);
+
+        this._cronInstance = $(cronContainer).jqCron().data('jqCron');
+        this.scopeSubtree(cronContainer);
+
+        var self = this;
+        $cronContainer.on('cron:change', function(event, cronValue) {
+          self.value = cronValue;
+        });
+
+        this._isReady = true;
+      },
+
+      _internalValidStateUpdate: function(required) {
+        if (this._isReady) {
+          this.validate();
+        }
+      },
+
+      _valueChanged: function(newValue, oldValue) {
+
+        this._setCronValue(newValue);
+
+        if (this.autoValidate) {
+          this.validate(true);
+        }
+
+        this._fireValueChangedEvent(newValue);
+      },
+
+      validate: function(showError) {
+
+        if (showError === undefined) showError = this.autoValidate;
+
+        return this._validate(showError);
+      },
+
+      _validate: function(showError) {
+
+        var validationResult = this._validateBaseData();
+        this._handleValidationResult(validationResult);
+        if (!validationResult.isValid) {
+          return validationResult.isValid;
+        }
+
+        validationResult = this._validateData(this, this.value, this.T.bind(this));
+        if (showError) this._handleValidationResult(validationResult);
+
+        return validationResult.isValid;
+      },
+
+      _updateUIValidState: function (valid) {
+
+      },
+
+      _getCronValue: function() {
+        return this._cronInstance.getCron();
+      },
+
+      _setCronValue: function(newValue) {
+        if (!this._cronInstance) {
+          return;
+        }
+        var current = this._getCronValue();
+        if (current !== newValue) {
+          this._cronInstance.setCron(newValue);
+        }
+      }
+    });
+  </script>
+</dom-module>
