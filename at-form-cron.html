@@ -1,8 +1,10 @@
 <link rel="import" href="../tangere/tangere.html">
+<link rel="import" href="../at-theme/at-theme.html">
 <link rel="import" href="../jquery2-import/jquery2-import.html">
 <link rel="import" href="../at-i18n/at-i18n-behavior.html">
 <link rel="import" href="../at-form-behaviors/at-form-behaviors.html">
 <link rel="import" href="styles/jqcron-styles.html">
+<link rel="import" href="at-form-cron-input-validation-behavior.html">
 
 <script src="scripts/jqCron.js" charset="utf-8"></script>
 <script src="scripts/jqCron.en.js" charset="utf-8"></script>
@@ -35,7 +37,7 @@
     'use strict';
     Polymer({
       is: 'at-form-cron',
-      behaviors: [Tangere.behaviors.i18n, Tangere.behaviors.formUIGeneric],
+      behaviors: [Tangere.behaviors.i18n, Tangere.behaviors.formUIGeneric, Tangere.behaviors.AtFormCronInputValidation ],
       properties: {
         /**
          * Element's label for element display purposes
@@ -131,7 +133,12 @@
       _disabledChanged: function(newValue, oldValue) {
         this.toggleClass('disabled', newValue, this.$.atContainer);
         if (this._cronInstance) {
-          var result = newValue ? this._cronInstance.disable() : this._cronInstance.enable();
+          if (newValue) {
+            this._cronInstance.disable();
+          } else {
+            this._cronInstance.enable();
+          }
+          // var result = newValue ? this._cronInstance.disable() : this._cronInstance.enable();
         }
       },
 
@@ -148,10 +155,15 @@
 
         var self = this;
         $cronContainer.on('cron:change', function(event, cronValue) {
-          self.value = cronValue;
+          if (this._internalValueUpdate) return;
+          self.debounce('cronchange', function() {
+            self.validate();
+          }, 100);
         });
 
+        this._valueChanged(this.value, "called from ready");
         this._isReady = true;
+        this._internalValidStateUpdate(this.required);
       },
 
       _internalValidStateUpdate: function(required) {
@@ -162,24 +174,36 @@
 
       _valueChanged: function(newValue, oldValue) {
 
-        this._setCronValue(newValue);
-
-        if (this.autoValidate) {
-          this.validate(true);
+        if (newValue !== null && this._isValidCronValue(newValue)) {
+          this._setCronValue(newValue);
+        } else {
+          this._internalValueUpdate = true;
+          this._setCronValue("* * * * *");
+          this._internalValueUpdate = false;
         }
 
-        this._fireValueChangedEvent(newValue);
+        if (this.autoValidate) {
+          this._validate(true);
+        }
+        if (this._isReady) {
+          this._fireValueChangedEvent(newValue);
+        }
       },
 
       validate: function(showError) {
-
         if (showError === undefined) showError = this.autoValidate;
+
+        var cronValue = this._getCronValue();
+        if (([null, ""].indexOf(this.value) !== -1 && cronValue !== "* * * * *") || ([null, ""].indexOf(this.value) === -1 && this.value !== cronValue)) {
+          if (this._isValidCronValue(this.value)) {
+            this.value = cronValue;
+          }
+        }
 
         return this._validate(showError);
       },
 
       _validate: function(showError) {
-
         var validationResult = this._validateBaseData();
         this._handleValidationResult(validationResult);
         if (!validationResult.isValid) {
@@ -187,14 +211,27 @@
         }
 
         validationResult = this._validateData(this, this.value, this.T.bind(this));
-        if (showError) this._handleValidationResult(validationResult);
+        if (showError) { this._handleValidationResult(validationResult); }
 
         return validationResult.isValid;
       },
 
-      _updateUIValidState: function (valid) {
-
+      _updateUIValidState: function(isValid) {
+        var label = this.$.label;
+        this.toggleClass('error', !isValid, label);
+        var contentContainer = this.$.contentContainer;
+        this.toggleClass('error', !isValid, contentContainer);
       },
+
+      focus: function() {},
+
+      _getFocusableElement: function() {
+        return this;
+      },
+
+      /********************************************************************************/
+      /* Helper methods
+      /********************************************************************************/
 
       _getCronValue: function() {
         return this._cronInstance.getCron();
@@ -208,6 +245,29 @@
         if (current !== newValue) {
           this._cronInstance.setCron(newValue);
         }
+      },
+
+      _isValidCronValue(value) {
+        function isString(obj) {
+          return Object.prototype.toString.call(obj) === "[object String]";
+        }
+
+        if (value === null) return true;
+
+        if (!isString(value)) return false;
+
+        var parts = value.split(" ");
+
+        if (parts.length !== 5) return false;
+
+        var isValid = true;
+
+        for (var i = 0; i < parts.length && isValid; i++) {
+          var part = parts[i];
+          isValid = isValid && (part === "*" || !isNaN(parseInt(part)));
+        }
+
+        return isValid;
       }
     });
   </script>
