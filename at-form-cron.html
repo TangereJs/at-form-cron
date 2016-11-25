@@ -7,7 +7,6 @@
 <link rel="import" href="at-form-cron-input-validation-behavior.html">
 
 <script src="scripts/jqCron.js" charset="utf-8"></script>
-<script src="scripts/jqCron.en.js" charset="utf-8"></script>
 
 <dom-module id="at-form-cron">
   <template>
@@ -146,7 +145,42 @@
         var cronContainer = this.$.contentContainer;
         var $cronContainer = $(cronContainer);
 
-        this._cronInstance = $(cronContainer).jqCron().data('jqCron');
+        var cronOptions = {
+          multiple_time_minutes: true,
+          required: this.required,
+          texts: {
+            en: {
+              empty: this.T('-all-'),
+              empty_minutes: this.T('every'),
+              empty_time_hours: this.T('every hour'),
+              empty_time_minutes: this.T('every minute'),
+              empty_day_of_week: this.T('every day of the week'),
+              empty_day_of_month: this.T('every day of the month'),
+              empty_month: this.T('every month'),
+              name_none: this.T('none'),
+              name_minute: this.T('every'),
+              name_hour: this.T('hourly'),
+              name_day: this.T('daily'),
+              name_week: this.T('weekly'),
+              name_month: this.T('monthly'),
+              name_year: this.T('yearly'),
+              text_period: this.T('<b />'),
+              text_mins: this.T(' at <b /> minute(s) past the hour'),
+              text_time: this.T(' at <b />:<b />'),
+              text_dow: this.T(' on <b />'),
+              text_month: this.T(' of <b />'),
+              text_dom: this.T(' on <b />'),
+              error1: this.T('The tag %s is not supported !'),
+              error2: this.T('Bad number of elements'),
+              error3: this.T('The jquery_element should be set into jqCron settings'),
+              error4: this.T('Unrecognized expression'),
+              weekdays: [this.T('monday'), this.T('tuesday'), this.T('wednesday'), this.T('thursday'), this.T('friday'), this.T('saturday'), this.T('sunday')],
+              months: [this.T('january'), this.T('february'), this.T('march'),  this.T('april'), this.T('may'), this.T('june'), this.T('july'), this.T('august'), this.T('september'), this.T('october'), this.T('november'), this.T('december')]
+            }
+          }
+        };
+
+        this._cronInstance = $(cronContainer).jqCron(cronOptions).data('jqCron');
         this.scopeSubtree(cronContainer);
 
         var self = this;
@@ -169,12 +203,16 @@
       },
 
       _valueChanged: function(newValue, oldValue) {
-
+        
         if (newValue !== null && this._isValidCronValue(newValue)) {
           this._setCronValue(newValue);
         } else {
           this._internalValueUpdate = true;
-          this._setCronValue("* * * * *");
+          if ([null, ""].indexOf(newValue) !== -1) {
+            this._setCronValue("- - - - -");
+          } else {
+            this._setCronValue("* * * * *");
+          }
           this._internalValueUpdate = false;
         }
 
@@ -248,7 +286,7 @@
           return Object.prototype.toString.call(obj) === "[object String]";
         }
 
-        if (value === null) return true;
+        if ([null, ""].indexOf(value) !== -1) return true;
 
         if (!isString(value)) return false;
 
@@ -260,7 +298,7 @@
 
         for (var i = 0; i < parts.length && isValid; i++) {
           var part = parts[i];
-          isValid = isValid && (part === "*" || !isNaN(parseInt(part)));
+          isValid = isValid && (["*", "-"].indexOf(part) !== -1 || !isNaN(parseInt(part)));
         }
 
         return isValid;
