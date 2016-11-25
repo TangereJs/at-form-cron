@@ -35,6 +35,7 @@
   </template>
   <script>
     'use strict';
+
     Polymer({
       is: 'at-form-cron',
       behaviors: [Tangere.behaviors.i18n, Tangere.behaviors.formUIGeneric, Tangere.behaviors.AtFormCronInputValidation ],
@@ -133,12 +134,7 @@
       _disabledChanged: function(newValue, oldValue) {
         this.toggleClass('disabled', newValue, this.$.atContainer);
         if (this._cronInstance) {
-          if (newValue) {
-            this._cronInstance.disable();
-          } else {
-            this._cronInstance.enable();
-          }
-          // var result = newValue ? this._cronInstance.disable() : this._cronInstance.enable();
+          var result = newValue ? this._cronInstance.disable() : this._cronInstance.enable();
         }
       },
 
@@ -247,7 +243,7 @@
         }
       },
 
-      _isValidCronValue(value) {
+      _isValidCronValue: function(value) {
         function isString(obj) {
           return Object.prototype.toString.call(obj) === "[object String]";
         }
