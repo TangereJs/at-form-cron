@@ -159,7 +159,7 @@
         var required_ = Boolean(required);
 
         // if required is true return true if value is not undefined, null or ""
-        validationResult.isValid = !required_ || ([undefined, null, ""].indexOf(value) === -1 && value !== "* * * * *") ;
+        validationResult.isValid = !required_ || ([undefined, null, "", "* * * * *", "- - - - -"].indexOf(value) === -1) ;
         if (!validationResult.isValid) {
           validationResult.errorMessage = localizer("This field is required.");
         }

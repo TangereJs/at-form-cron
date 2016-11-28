@@ -158,6 +158,7 @@
         input.value = null;
 
         assert.equal(input.value, null, 'value not set correctly');
+        assert.equal(input._getCronValue(), "- - - - -", "cron value is not correct");
         assert.equal(input.valid, true, 'element is not valid');
 
         var eventCount = 0;
@@ -211,6 +212,7 @@
         input.value = null;
 
         assert.equal(input.value, null, 'value not set correctly');
+        assert.equal(input._getCronValue(), "- - - - -", "cron value is not correct");
         assert.equal(input.valid, false, 'element is valid');
 
         var eventCount = 0;
@@ -264,12 +266,13 @@
         input.value = null;
 
         assert.equal(input.value, null, 'value not set correctly');
+        assert.equal(input._getCronValue(), "- - - - -", "cron value is not correct");
         assert.equal(input.valid, true, 'element is invalid');
 
         var eventCount = 0;
         input.addEventListener('value-changed', function(event) {
-          assert.equal(event.detail.value, '', 'event detail value not set correctly');
-          assert.equal(input.value, '', 'event detail value not set correctly');
+          assert.equal(event.detail.value, '* * * * *', 'event detail value not set correctly');
+          assert.equal(input.value, '* * * * *', 'event detail value not set correctly');
           assert.equal(input.valid, true, 'element is invalid');
           eventCount += 1;
         });
@@ -287,6 +290,7 @@
         input.value = null;
 
         assert.equal(input.value, null, 'value not set correctly');
+        assert.equal(input._getCronValue(), "- - - - -", "cron value is not correct");
         assert.equal(input.valid, true, 'element is invalid');
 
         var eventCount = 0;

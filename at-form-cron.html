@@ -203,18 +203,18 @@
       },
 
       _valueChanged: function(newValue, oldValue) {
-        
-        if (newValue !== null && this._isValidCronValue(newValue)) {
-          this._setCronValue(newValue);
-        } else {
-          this._internalValueUpdate = true;
+
+        this._internalValueUpdate = true;
+        if (this._isValidCronValue(newValue)) {
           if ([null, ""].indexOf(newValue) !== -1) {
             this._setCronValue("- - - - -");
           } else {
-            this._setCronValue("* * * * *");
+            this._setCronValue(newValue);
           }
-          this._internalValueUpdate = false;
+        } else {
+          this._setCronValue("- - - - -");
         }
+        this._internalValueUpdate = false;
 
         if (this.autoValidate) {
           this._validate(true);
@@ -228,7 +228,7 @@
         if (showError === undefined) showError = this.autoValidate;
 
         var cronValue = this._getCronValue();
-        if (([null, ""].indexOf(this.value) !== -1 && cronValue !== "* * * * *") || ([null, ""].indexOf(this.value) === -1 && this.value !== cronValue)) {
+        if (([null, ""].indexOf(this.value) !== -1 && ["* * * * *", "- - - - -"].indexOf(cronValue) === -1) || ([null, ""].indexOf(this.value) === -1 && this.value !== cronValue)) {
           if (this._isValidCronValue(this.value)) {
             this.value = cronValue;
           }
