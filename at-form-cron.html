@@ -7,6 +7,9 @@
 <link rel="import" href="at-form-cron-input-validation-behavior.html">
 
 <script src="scripts/jqCron.js" charset="utf-8"></script>
+<script src="scripts/jqCron.en.js" charset="utf-8"></script>
+<script src="scripts/jqCron.sr.js" charset="utf-8"></script>
+<script src="scripts/jqCron.de.js" charset="utf-8"></script>
 
 <dom-module id="at-form-cron">
   <template>
@@ -148,36 +151,7 @@
         var cronOptions = {
           multiple_time_minutes: true,
           required: this.required,
-          texts: {
-            en: {
-              empty: this.T('-all-'),
-              empty_minutes: this.T('every'),
-              empty_time_hours: this.T('every hour'),
-              empty_time_minutes: this.T('every minute'),
-              empty_day_of_week: this.T('every day of the week'),
-              empty_day_of_month: this.T('every day of the month'),
-              empty_month: this.T('every month'),
-              name_none: this.T('none'),
-              name_minute: this.T('every'),
-              name_hour: this.T('hourly'),
-              name_day: this.T('daily'),
-              name_week: this.T('weekly'),
-              name_month: this.T('monthly'),
-              name_year: this.T('yearly'),
-              text_period: this.T('<b />'),
-              text_mins: this.T(' at <b /> minute(s) past the hour'),
-              text_time: this.T(' at <b />:<b />'),
-              text_dow: this.T(' on <b />'),
-              text_month: this.T(' of <b />'),
-              text_dom: this.T(' on <b />'),
-              error1: this.T('The tag %s is not supported !'),
-              error2: this.T('Bad number of elements'),
-              error3: this.T('The jquery_element should be set into jqCron settings'),
-              error4: this.T('Unrecognized expression'),
-              weekdays: [this.T('monday'), this.T('tuesday'), this.T('wednesday'), this.T('thursday'), this.T('friday'), this.T('saturday'), this.T('sunday')],
-              months: [this.T('january'), this.T('february'), this.T('march'),  this.T('april'), this.T('may'), this.T('june'), this.T('july'), this.T('august'), this.T('september'), this.T('october'), this.T('november'), this.T('december')]
-            }
-          }
+          lang: this.getLocale()
         };
 
         this._cronInstance = $(cronContainer).jqCron(cronOptions).data('jqCron');
