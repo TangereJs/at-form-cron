@@ -7,9 +7,6 @@
 <link rel="import" href="at-form-cron-input-validation-behavior.html">
 
 <script src="scripts/jqCron.js" charset="utf-8"></script>
-<script src="scripts/jqCron.en.js" charset="utf-8"></script>
-<script src="scripts/jqCron.sr.js" charset="utf-8"></script>
-<script src="scripts/jqCron.de.js" charset="utf-8"></script>
 
 <dom-module id="at-form-cron">
   <template>
@@ -154,7 +151,7 @@
           lang: this.getLocale()
         };
 
-        this._cronInstance = $(cronContainer).jqCron(cronOptions).data('jqCron');
+        this._cronInstance = $(cronContainer).jqCron(cronOptions, this).data('jqCron');
         this.scopeSubtree(cronContainer);
 
         var self = this;

@@ -1,0 +1,51 @@
+!function() {
+
+	var translations = {
+		empty: '-svi-',
+		empty_minutes: 'minuta',
+		empty_time_hours: 'svakog sata',
+		empty_time_minutes: 'svakog minuta',
+		empty_day_of_week: 'svakog dana u sedmici',
+		empty_day_of_month: 'svakog dana u mesecu',
+		empty_month: 'svakog meseca',
+		name_none: 'prazno',
+		name_minute: 'svakog',
+		name_hour: 'svakog sata',
+		name_day: 'svakog dana',
+		name_week: 'sedmično',
+		name_month: 'mesečno',
+		name_year: 'godišnje',
+		text_period: '<b />',
+		text_mins: ' u <b /> minuta posle punog sata',
+		text_time: ' u <b />:<b />',
+		text_dow: ' <b />',
+		text_month: ' <b />',
+		text_dom: ' <b />',
+		error1: 'Tag %s nije podržan!',
+		error2: 'Netačan broj elemenata',
+		error3: 'jquery_element treba biti deo jqCron settings objekta',
+		error4: 'Iskaz nije prepoznat',
+		monday: 'ponedeljak',
+		tuesday: 'utorak',
+		wednesday: 'sreda',
+		thursday: 'četvrtak',
+		friday: 'petak',
+		saturday: 'subota',
+		sunday: 'nedelja',
+		january: 'januar',
+		february: 'februar',
+		march: 'mart',
+		april: 'april',
+		may: 'maj',
+		june: 'jun',
+		july: 'jul',
+		august: 'august',
+		september: 'septembar',
+		october: 'octobar',
+		november: 'novembar',
+		december: 'decembar'
+	};
+
+	Polymer.atI18nLocales.add('at-form-cron', 'sr', translations);
+
+}();

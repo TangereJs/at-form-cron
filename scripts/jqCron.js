@@ -11,31 +11,6 @@
  * Default settings
  */
 var jqCronDefaultSettings = {
-    texts: {
-        en: {
-            empty: '-all-',
-            name_none: 'none',
-            name_minute: 'every',
-            name_hour: 'hourly',
-            name_day: 'daily',
-            name_week: 'weekly',
-            name_month: 'monthly',
-            name_year: 'yearly',
-            text_period: '<b />',
-            text_mins: 'at <b /> minutes past the hour',
-            text_mins_period: '<b /> minute(s)',
-            text_time: 'at <b />:<b />',
-            text_dow: 'on <b />',
-            text_month: 'of <b />',
-            text_dom: 'on the <b />',
-            error1: 'The tag %s is not supported !',
-            error2: 'Bad number of elements',
-            error3: 'The jquery_element should be set into jqCron settings',
-            error4: 'Unrecognized expression',
-            weekdays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
-            months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
-        }
-    },
     monthdays: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
     hours: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
     minutes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
@@ -61,7 +36,7 @@ var jqCronDefaultSettings = {
     bind_to: null,
     bind_method: {
         set: function ($element, value) {
-            $element.is(':input') ? $element.val(value) : $element.data('jqCronValue', value);
+            var result = $element.is(':input') ? $element.val(value) : $element.data('jqCronValue', value);
         },
         get: function ($element) {
             return $element.is(':input') ? $element.val() : $element.data('jqCronValue');
@@ -71,7 +46,7 @@ var jqCronDefaultSettings = {
 
 /**
  * Custom extend of json for jqCron settings.
- * We don't use jQuery.extend because simple extend does not fit our needs, and deep extend has a bad 
+ * We don't use jQuery.extend because simple extend does not fit our needs, and deep extend has a bad
  * feature for us : it replaces keys of "Arrays" instead of replacing the full array.
  */
 (function ($) {
@@ -107,7 +82,7 @@ var jqCronDefaultSettings = {
  * Main plugin
  */
 (function ($) {
-    $.fn.jqCron = function (settings) {
+    $.fn.jqCron = function (settings, formCron) {
         return this.each(function () {
             var cron, saved;
             var $this = $(this);
@@ -125,7 +100,7 @@ var jqCronDefaultSettings = {
                     settings.jquery_element = $('<span class="jqCron"></span>').uniqueId('jqCron').insertAfter($this);
                 }
                 else {
-                    console && console.error(settings.texts[settings.lang].error1.replace('%s', this.tagName));
+                    var result = console && console.error(formCron.T('error1').replace('%s', this.tagName));
                     return;
                 }
             }
@@ -149,7 +124,7 @@ var jqCronDefaultSettings = {
                 cron.setCron(saved);
             }
             else {
-                cron = new jqCron(settings);
+                cron = new jqCron(settings, formCron);
             }
             $(this).data('jqCron', cron);
         });
@@ -162,7 +137,7 @@ var jqCronDefaultSettings = {
 (function ($) {
     var jqCronInstances = [];
 
-    function jqCron(settings) {
+    function jqCron(settings, formCron) {
         var _initialized = false;
         var _self = this;
         var _$elt = this;
@@ -212,7 +187,7 @@ var jqCronDefaultSettings = {
                     }
                 }
                 // we propagate the change event to the main object
-                boundChanged || _$obj.trigger('cron:change', _self.getCron());
+                var result = boundChanged || _$obj.trigger('cron:change', _self.getCron());
             });
             _selectors.push(selector);
             return selector;
@@ -227,7 +202,7 @@ var jqCronDefaultSettings = {
 
         // return if the selector is disabled
         this.isDisabled = function () {
-            return settings.disable == true;
+            return settings.disable === true;
         };
 
         // enable the selector
@@ -338,11 +313,35 @@ var jqCronDefaultSettings = {
         // get the main element id
         this.getId = function () {
             return _$elt.attr('id');
-        }
+        };
+
+        var txtLocalizationKeys = {
+          empty: '-all-',
+          name_none: 'none',
+          name_minute: 'every',
+          name_hour: 'hourly',
+          name_day: 'daily',
+          name_week: 'weekly',
+          name_month: 'monthly',
+          name_year: 'yearly',
+          text_period: '<b />',
+          text_mins: 'at <b /> minutes past the hour',
+          text_mins_period: '<b /> minute(s)',
+          text_time: 'at <b />:<b />',
+          text_dow: 'on <b />',
+          text_month: 'of <b />',
+          text_dom: 'on the <b />',
+          error1: 'The tag %s is not supported !',
+          error2: 'Bad number of elements',
+          error3: 'The jquery_element should be set into jqCron settings',
+          error4: 'Unrecognized expression',
+          weekdays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+          months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
+        };
 
         // get the translated text
         this.getText = function (key) {
-            var text = settings.texts[settings.lang][key] || null;
+            var text = formCron.T(key) || null;
             if (typeof (text) == "string" && text.match('<b')) {
                 text = text.replace(/(<b *\/>)/gi, '</span><b /><span class="jqCron-text">');
                 text = '<span class="jqCron-text">' + text + '</span>';
@@ -358,10 +357,10 @@ var jqCronDefaultSettings = {
 		    .find('.jqCron-text, .jqCron-selector > span')
 		    .each(function () {
 		        var text = $(this).text().replace(/\s+$/g, '').replace(/^\s+/g, '');
-		        text && texts.push(text);
+		        var result = text && texts.push(text);
 		    });
             return texts.join(' ').replace(/\s:\s/g, ':');
-        }
+        };
 
         // get settings
         this.getSettings = function () {
@@ -370,7 +369,7 @@ var jqCronDefaultSettings = {
 
         // display an error
         this.error = function (msg) {
-            console && console.error('[jqCron Error] ' + msg);
+            var result = console && console.error('[jqCron Error] ' + msg);
             _$obj.addClass('jqCron-error').attr('title', msg);
             throw msg;
         };
@@ -397,14 +396,14 @@ var jqCronDefaultSettings = {
             if (_initialized) return;
 
             settings = jqCronMergeSettings(settings);
-            settings.jquery_element || _self.error(_self.getText('error3'));
+            var result = settings.jquery_element || _self.error(_self.getText('error3'));
             _$elt = settings.jquery_element;
             _$elt.append(_$obj);
             _$obj.data('id', settings.id);
             _$obj.data('jqCron', _self);
             _$obj.append(_$blocks);
-            settings.no_reset_button || _$obj.append(_$cross);
-            (!settings.disable) || _$obj.addClass('disable');
+            result = settings.no_reset_button || _$obj.append(_$cross);
+            result = (!settings.disable) || _$obj.addClass('disable');
             _$blocks.append(_$blockPERIOD);
             _$blocks.append(_$blockDOM);
             _$blocks.append(_$blockMONTH);
@@ -415,26 +414,26 @@ var jqCronDefaultSettings = {
 
             // various binding
             _$cross.click(function () {
-                _self.isDisabled() || _self.clear();
+                var result = _self.isDisabled() || _self.clear();
             });
 
             // binding from cron to target
             _$obj.bind('cron:change', function (evt, value) {
                 if (!settings.bind_to) return;
-                settings.bind_method.set && settings.bind_method.set(settings.bind_to, value);
+                var result = settings.bind_method.set && settings.bind_method.set(settings.bind_to, value);
                 _self.clearError();
             });
 
             // PERIOD
             _$blockPERIOD.append(_self.getText('text_period'));
             _selectorPeriod = newSelector(_$blockPERIOD, false);
-            !settings.required && _selectorPeriod.add('none', _self.getText('name_none'));
-            settings.enabled_minute && _selectorPeriod.add('minute', _self.getText('name_minute'));
-            settings.enabled_hour && _selectorPeriod.add('hour', _self.getText('name_hour'));
-            settings.enabled_day && _selectorPeriod.add('day', _self.getText('name_day'));
-            settings.enabled_week && _selectorPeriod.add('week', _self.getText('name_week'));
-            settings.enabled_month && _selectorPeriod.add('month', _self.getText('name_month'));
-            settings.enabled_year && _selectorPeriod.add('year', _self.getText('name_year'));
+            result = !settings.required && _selectorPeriod.add('none', _self.getText('name_none'));
+            result = settings.enabled_minute && _selectorPeriod.add('minute', _self.getText('name_minute'));
+            result = settings.enabled_hour && _selectorPeriod.add('hour', _self.getText('name_hour'));
+            result = settings.enabled_day && _selectorPeriod.add('day', _self.getText('name_day'));
+            result = settings.enabled_week && _selectorPeriod.add('week', _self.getText('name_week'));
+            result = settings.enabled_month && _selectorPeriod.add('month', _self.getText('name_month'));
+            result = settings.enabled_year && _selectorPeriod.add('year', _self.getText('name_year'));
             _selectorPeriod.$.bind('selector:change', function (e, value) {
                 _$blockDOM.hide();
                 _$blockMONTH.hide();
@@ -491,12 +490,14 @@ var jqCronDefaultSettings = {
             for (i = 0, list = settings.minutes; i < list.length; i++) {
                 _selectorTimeM.add(list[i], list[i]);
             }
-
+            var localizedText;
             // DOW  (day of week)
             _$blockDOW.append(_self.getText('text_dow'));
             _selectorDow = newSelector(_$blockDOW, settings.multiple_dow);
-            for (i = 0, list = _self.getText('weekdays') ; i < list.length; i++) {
-                _selectorDow.add(i + 1, list[i]);
+            var weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            for (i = 0, list = weekdays ; i < list.length; i++) {
+                localizedText = _self.getText(list[i]);
+                _selectorDow.add(i + 1, localizedText);
             }
 
             // DOM  (day of month)
@@ -509,10 +510,11 @@ var jqCronDefaultSettings = {
             // MONTH  (day of week)
             _$blockMONTH.append(_self.getText('text_month'));
             _selectorMonth = newSelector(_$blockMONTH, settings.multiple_month);
-            for (i = 0, list = _self.getText('months') ; i < list.length; i++) {
+            var months = ['january', 'february', 'march',  'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+            for (i = 0, list = months ; i < list.length; i++) {
+                localizedText = _self.getText(list[i]);
                 _selectorMonth.add(i + 1, list[i]);
             }
-
             // close all selectors when we click in body
             $('body').click(function () {
                 var i, n = _selectors.length;
@@ -520,6 +522,7 @@ var jqCronDefaultSettings = {
                     _selectors[i].close();
                 }
             });
+
             _initialized = true;
 
             // default value
@@ -543,7 +546,9 @@ var jqCronDefaultSettings = {
         try {
             this.init();
             _self.triggerChange();
-        } catch (e) { }
+        } catch (e) {
+          console.log(e);
+        }
     }
     this.jqCron = jqCron;
 }).call(this, jQuery);
@@ -567,7 +572,7 @@ var jqCronDefaultSettings = {
         function array_unique(l) {
             var i = 0, n = l.length, k = {}, a = [];
             while (i < n) {
-                k[l[i]] || (k[l[i]] = 1 && a.push(l[i]));
+                var result = k[l[i]] || (k[l[i]] = 1 && a.push(l[i]));
                 i++;
             }
             return a;
@@ -580,7 +585,7 @@ var jqCronDefaultSettings = {
 
         // get a correct string for cron
         this.getCronValue = function () {
-            if (_value.length == 0) return '*';
+            if (_value.length === 0) return '*';
             var cron = [_value[0]], i, s = _value[0], c = _value[0], n = _value.length;
             for (i = 1; i < n; i++) {
                 if (_value[i] == c + 1) {
@@ -595,11 +600,11 @@ var jqCronDefaultSettings = {
             return cron.join(',');
         };
 
-        // set the cron value 
+        // set the cron value
         this.setCronValue = function (str) {
             var values = [], m, i, n;
             if (str !== '*') {
-                while (str != '') {
+                while (str !== '') {
                     // test "*/n" expression
                     m = str.match(/^\*\/([0-9]+),?/);
                     if (m && m.length == 2) {
@@ -721,7 +726,7 @@ var jqCronDefaultSettings = {
                 return (key in _values) ? _values[key].text() : key;
             };
 
-            if (_value.length == 0) return _cron.getText('empty');
+            if (_value.length === 0) return _cron.getText('empty');
             var cron = [getValueText(_value[0])], i, s = _value[0], c = _value[0], n = _value.length;
             for (i = 1; i < n; i++) {
                 if (_value[i] == c + 1) {
@@ -794,9 +799,9 @@ var jqCronDefaultSettings = {
 		})
 		.trigger('selector:change')
         ;
-        $.fn.disableSelection && _$selector.disableSelection(); // only work with jQuery UI
+        var result = $.fn.disableSelection && _$selector.disableSelection(); // only work with jQuery UI
         _$title.click(function (e) {
-            (_self.isOpened() || _cron.isDisabled()) ? _self.close() : _self.open();
+            var result = (_self.isOpened() || _cron.isDisabled()) ? _self.close() : _self.open();
         });
         _self.close();
         _self.clear();
