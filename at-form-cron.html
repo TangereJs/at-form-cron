@@ -145,29 +145,26 @@
         var cronContainer = this.$.contentContainer;
         var $cronContainer = $(cronContainer);
 
-        var cronOptions = {
-          multiple_time_minutes: true,
-          required: this.required,
-          lang: this.getLocale()
-        };
-
-        this._cronInstance = $(cronContainer).jqCron(cronOptions, this).data('jqCron');
-        this.scopeSubtree(cronContainer);
+        this._createCronInstance();
 
         var self = this;
         $cronContainer.on('cron:change', function(event, cronValue) {
-          if (this._internalValueUpdate) return;
+          if (self._internalValueUpdate) return;
           self.debounce('cronchange', function() {
             self.validate();
           }, 100);
         });
 
-        this._valueChanged(this.value, "called from ready");
         this._isReady = true;
-        this._internalValidStateUpdate(this.required);
+        this._internalValidStateUpdate(this.required, true);
       },
 
-      _internalValidStateUpdate: function(required) {
+      _internalValidStateUpdate: function(required, skip) {
+        // when required changes the fastest way to add/remove 'none' is to recreate cron instance
+        if (!skip) {
+          this._createCronInstance();
+        }
+
         if (this._isReady) {
           this.validate();
         }
@@ -199,7 +196,7 @@
         if (showError === undefined) showError = this.autoValidate;
 
         var cronValue = this._getCronValue();
-        if (([null, ""].indexOf(this.value) !== -1 && ["* * * * *", "- - - - -"].indexOf(cronValue) === -1) || ([null, ""].indexOf(this.value) === -1 && this.value !== cronValue)) {
+        if (([null].indexOf(this.value) !== -1 && ["* * * * *", "- - - - -"].indexOf(cronValue) === -1) || ([null].indexOf(this.value) === -1 && this.value !== cronValue)) {
           if (this._isValidCronValue(this.value)) {
             this.value = cronValue;
           }
@@ -237,6 +234,34 @@
       /********************************************************************************/
       /* Helper methods
       /********************************************************************************/
+
+      _createCronInstance: function() {
+        var cronContainer = this.$.contentContainer;
+        Polymer.dom(cronContainer).innerHTML = "";
+        var $cronContainer = $(cronContainer);
+
+        var currentValue = this.value;
+        var defaultValue;
+        if (this._isValidCronValue(currentValue)) {
+          if ([null, ""].indexOf(currentValue) !== -1) {
+            defaultValue = "- - - - -";
+          } else {
+            defaultValue = currentValue;
+          }
+        } else {
+          defaultValue = "- - - - -";
+        }
+
+        var cronOptions = {
+          multiple_time_minutes: true,
+          required: this.required,
+          default_value: defaultValue,
+          lang: this.getLocale()
+        };
+
+        this._cronInstance = $(cronContainer).jqCron(cronOptions, this).data('jqCron');
+        this.scopeSubtree(cronContainer);
+      },
 
       _getCronValue: function() {
         return this._cronInstance.getCron();
