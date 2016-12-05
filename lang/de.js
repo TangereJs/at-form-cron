@@ -17,6 +17,7 @@
 		name_year: 'yearly',
 		text_period: '<b />',
 		text_mins: ' at <b /> minute(s) past the hour',
+		text_mins_period: '<b /> minute(s)',
 		text_time: ' at <b />:<b />',
 		text_dow: ' on <b />',
 		text_month: ' of <b />',

@@ -125,7 +125,7 @@
         test('value empty, required false, autovalidate false', function () {
           var element = fixture('valueEmptyRequiredFalseAutoValidateFalse');
 
-          assert.equal(element.value, "- - - - -", "value not set correctly");
+          assert.equal(element.value, "", "value not set correctly");
           assert.equal(element.required, false, "required not set correctly");
           assert.equal(element.autoValidate, false, "autoValidate not set correctly");
 
@@ -231,7 +231,7 @@
         test('value empty, required true, autovalidate false', function () {
           var element = fixture('valueEmptyRequiredTrueAutoValidateFalse');
 
-          assert.equal(element.value, "* * * * *", "value not set correctly");
+          assert.equal(element.value, "", "value not set correctly");
           assert.equal(element.required, true, "required not set correctly");
           assert.equal(element.autoValidate, false, "autoValidate not set correctly");
 
@@ -336,7 +336,7 @@
         test('value empty, required false, autovalidate true', function () {
           var element = fixture('valueEmptyRequiredFalseAutoValidateTrue');
 
-          assert.equal(element.value, "- - - - -", "value not set correctly");
+          assert.equal(element.value, "", "value not set correctly");
           assert.equal(element.required, false, "required not set correctly");
           assert.equal(element.autoValidate, true, "autoValidate not set correctly");
 
@@ -441,7 +441,7 @@
         test('value empty, required true, autovalidate true', function () {
           var element = fixture('valueEmptyRequiredTrueAutoValidateTrue');
 
-          assert.equal(element.value, "* * * * *", "value not set correctly");
+          assert.equal(element.value, "", "value not set correctly");
           assert.equal(element.required, true, "required not set correctly");
           assert.equal(element.autoValidate, true, "autoValidate not set correctly");
 
@@ -671,7 +671,7 @@
           element.value = "";
           element.required = true;
 
-          assert.equal(element.value, "* * * * *", "value not set correctly");
+          assert.equal(element.value, "", "value not set correctly");
           assert.equal(element.required, true, "required not set correctly");
           assert.equal(element.autoValidate, false, "autoValidate not set correctly");
 
@@ -891,7 +891,7 @@
           element.value = "";
           element.required = true;
 
-          assert.equal(element.value, "* * * * *", "value not set correctly");
+          assert.equal(element.value, "", "value not set correctly");
           assert.equal(element.required, true, "required not set correctly");
           assert.equal(element.autoValidate, true, "autoValidate not set correctly");
 

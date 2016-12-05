@@ -145,26 +145,48 @@
         var cronContainer = this.$.contentContainer;
         var $cronContainer = $(cronContainer);
 
-        this._createCronInstance();
+        var currentValue = this._internalValue;
+        var defaultValue;
+        if (this._isValidCronValue(currentValue)) {
+          if ([null, ""].indexOf(currentValue) !== -1) {
+            defaultValue = "- - - - -";
+          } else {
+            defaultValue = currentValue;
+          }
+        } else {
+          defaultValue = "- - - - -";
+        }
+
+        var cronOptions = {
+          enabled_minute: true,
+          multiple_dom: true,
+          multiple_month: true,
+          multiple_mins: true,
+          multiple_dow: true,
+          multiple_time_hours: true,
+          multiple_time_minutes: true,
+          default_period: 'hour',
+          required: false,
+          default_value: defaultValue,
+          lang: this.getLocale()
+        };
+
+        this._cronInstance = $(cronContainer).jqCron(cronOptions, this).data('jqCron');
+        this.scopeSubtree(cronContainer);
 
         var self = this;
         $cronContainer.on('cron:change', function(event, cronValue) {
           if (self._internalValueUpdate) return;
           self.debounce('cronchange', function() {
-            self.validate();
+            self.validate(self.autoValidate, true);
           }, 100);
         });
 
         this._isReady = true;
-        this._internalValidStateUpdate(this.required, true);
+        this._internalValidStateUpdate(this.required);
       },
 
       _internalValidStateUpdate: function(required, skip) {
-        // when required changes the fastest way to add/remove 'none' is to recreate cron instance
-        if (!skip) {
-          this._createCronInstance();
-        }
-
         if (this._isReady) {
           this.validate();
         }
@@ -175,11 +197,14 @@
         this._internalValueUpdate = true;
         if (this._isValidCronValue(newValue)) {
           if ([null, ""].indexOf(newValue) !== -1) {
+            this._internalValue = "- - - - -";
             this._setCronValue("- - - - -");
           } else {
+            this._internalValue = newValue;
             this._setCronValue(newValue);
           }
         } else {
+          this._internalValue = newValue;
           this._setCronValue("- - - - -");
         }
         this._internalValueUpdate = false;
@@ -192,12 +217,24 @@
         }
       },
 
-      validate: function(showError) {
+      validate: function(showError, isUserInput) {
         if (showError === undefined) showError = this.autoValidate;
 
-        var cronValue = this._getCronValue();
-        if (([null].indexOf(this.value) !== -1 && ["* * * * *", "- - - - -"].indexOf(cronValue) === -1) || ([null].indexOf(this.value) === -1 && this.value !== cronValue)) {
-          if (this._isValidCronValue(this.value)) {
+        // first if validate is executed not because of user input ignore following section
+        isUserInput = !!isUserInput;
+        if (isUserInput) {
+          // if validate is executed because of user input then
+          // this.value of null => this._internalValue = "- - - - -" => cronValue(display, value) = ('none', '- - - - -')
+          var cronValue = this._getCronValue();
+          if (
+            (this._internalValue !== "- - - - -" && cronValue !== "- - - - -") || // we do not want to erase this.value === null
+            (this._internalValue === "- - - - -" && this._internalValue !== cronValue) // but if null was already set but user selected a non 'none' value we want to set that
+          ) {
+            this.value = cronValue;
+
+          // also we want to set output value to none
+          // so if _internalValue is not 'none (- - - - -)' and user selected none (- - - - -) we want none to be set
+          } else if (this._internalValue !== "- - - - -" && cronValue === "- - - - -") {
             this.value = cronValue;
           }
         }
@@ -212,7 +249,7 @@
           return validationResult.isValid;
         }
 
-        validationResult = this._validateData(this, this.value, this.T.bind(this));
+        validationResult = this._validateData(this, this._internalValue, this.T.bind(this));
         if (showError) { this._handleValidationResult(validationResult); }
 
         return validationResult.isValid;
@@ -234,34 +271,6 @@
       /********************************************************************************/
       /* Helper methods
       /********************************************************************************/
-
-      _createCronInstance: function() {
-        var cronContainer = this.$.contentContainer;
-        Polymer.dom(cronContainer).innerHTML = "";
-        var $cronContainer = $(cronContainer);
-
-        var currentValue = this.value;
-        var defaultValue;
-        if (this._isValidCronValue(currentValue)) {
-          if ([null, ""].indexOf(currentValue) !== -1) {
-            defaultValue = "- - - - -";
-          } else {
-            defaultValue = currentValue;
-          }
-        } else {
-          defaultValue = "- - - - -";
-        }
-
-        var cronOptions = {
-          multiple_time_minutes: true,
-          required: this.required,
-          default_value: defaultValue,
-          lang: this.getLocale()
-        };
-
-        this._cronInstance = $(cronContainer).jqCron(cronOptions, this).data('jqCron');
-        this.scopeSubtree(cronContainer);
-      },
 
       _getCronValue: function() {
         return this._cronInstance.getCron();
@@ -286,15 +295,16 @@
 
         if (!isString(value)) return false;
 
-        var parts = value.split(" ");
+        var tmpValue = value.replace(/\s+/g, ' ').replace(/^ +/, '').replace(/ +$/, ''); // sanitize
+        var mask = tmpValue.replace(/[^\* ]/g, '-').replace(/-+/g, '-').replace(/ +/g, '');
+
+        var parts = tmpValue.split(" ");
 
         if (parts.length !== 5) return false;
 
         var isValid = true;
-
-        for (var i = 0; i < parts.length && isValid; i++) {
-          var part = parts[i];
-          isValid = isValid && (["*", "-"].indexOf(part) !== -1 || !isNaN(parseInt(part)));
+        for (var i = 0; i < mask.length && isValid; i++) {
+          isValid = isValid && ['*', '-'].indexOf(mask[i]) !== -1;
         }
 
         return isValid;

@@ -35,7 +35,7 @@
 
       test('validate function returns boolean false', function() {
         var input = fixture('validateFunctionTests');
-        assert.equal(input.value, '- - - - -', 'initial value not set correctly');
+        assert.equal(input.value, '', 'initial value not set correctly');
         assert.equal(input.valid, true, 'element is initially invalid');
 
         var result = input.validate();
@@ -46,7 +46,7 @@
       test('validate function returns boolean true', function() {
         var input = fixture('validateFunctionTests');
         input.required = true;
-        assert.equal(input.value, '* * * * *', 'initial value not set correctly');
+        assert.equal(input.value, '', 'initial value not set correctly');
         assert.equal(input.valid, false, 'element is initially invalid');
 
         var result = input.validate();

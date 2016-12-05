@@ -17,6 +17,7 @@
 		name_year: 'godišnje',
 		text_period: '<b />',
 		text_mins: ' u <b /> minuta posle punog sata',
+		text_mins_period: 'na svakih <b /> minute(s)',
 		text_time: ' u <b />:<b />',
 		text_dow: ' <b />',
 		text_month: ' <b />',

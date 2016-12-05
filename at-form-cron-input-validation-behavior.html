@@ -158,13 +158,40 @@
         };
         var required_ = Boolean(required);
 
+        if (!_isValidCronValue(value)) { return validationResult; }
+
         // if required is true return true if value is not undefined, null or ""
-        validationResult.isValid = !required_ || ([undefined, null, "", "* * * * *", "- - - - -"].indexOf(value) === -1) ;
+        validationResult.isValid = !required_ || ([undefined, null, "", "* * * * *", "*/* * * * *", "- - - - -"].indexOf(value) === -1);
         if (!validationResult.isValid) {
           validationResult.errorMessage = localizer("This field is required.");
         }
 
         return validationResult;
+      }
+
+      function _isValidCronValue(value) {
+        function isString(obj) {
+          return Object.prototype.toString.call(obj) === "[object String]";
+        }
+
+        if ([null, ""].indexOf(value) !== -1) return true;
+
+        if (!isString(value)) return false;
+
+        var tmpValue = value.replace(/\s+/g, ' ').replace(/^ +/, '').replace(/ +$/, ''); // sanitize
+        var mask = tmpValue.replace(/[^\* ]/g, '-').replace(/-+/g, '-').replace(/ +/g, '');
+
+        var parts = tmpValue.split(" ");
+
+        if (parts.length !== 5) return false;
+
+        var isValid = true;
+        for (var i = 0; i < mask.length && isValid; i++) {
+          isValid = isValid && ['*', '-'].indexOf(mask[i]) !== -1;
+
+        }
+
+        return isValid;
       }
     }
   };

@@ -212,7 +212,7 @@
         input.value = null;
 
         assert.equal(input.value, null, 'value not set correctly');
-        assert.equal(input._getCronValue(), "* * * * *", "cron value is not correct");
+        assert.equal(input._getCronValue(), "- - - - -", "cron value is not correct");
         assert.equal(input.valid, false, 'element is valid');
 
         var eventCount = 0;
