@@ -1,13 +1,13 @@
 !function() {
 
 	var translations = {
-		empty: '-all-',
-		empty_minutes: 'every',
-		empty_time_hours: 'every hour',
-		empty_time_minutes: 'every minute',
-		empty_day_of_week: 'every day of the week',
-		empty_day_of_month: 'every day of the month',
-		empty_month: 'every month',
+		empty: '-alle-',
+		empty_minutes: 'alle',
+		empty_time_hours: 'stündlich',
+		empty_time_minutes: 'minütlich',
+		empty_day_of_week: 'Wochentage',
+		empty_day_of_month: 'Kalendertag',
+		empty_month: 'jeden Monat',
 		name_none: 'none',
 		name_minute: 'every',
 		name_hour: 'hourly',
