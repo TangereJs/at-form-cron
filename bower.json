@@ -8,6 +8,7 @@
     "jquery2-import": "Polymer/jquery2-import#master",
     "at-i18n": "TangereJs/at-i18n#master",
     "at-form-behaviors": "TangereJs/at-form-behaviors#master",
-    "at-doc-viewer": "TangereJs/at-doc-viewer#master"
+    "at-doc-viewer": "TangereJs/at-doc-viewer#master",
+    "iron-label": "PolymerElements/iron-label#master"
   }
 }
