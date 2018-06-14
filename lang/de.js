@@ -1,4 +1,4 @@
-!function() {
+(function() {
 
 	var translations = {
 		empty: '-alle-',
@@ -49,4 +49,4 @@
 
 	Polymer.atI18nLocales.add('at-form-cron', 'de', translations);
 
-}();
+}());

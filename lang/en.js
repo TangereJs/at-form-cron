@@ -1,5 +1,5 @@
 
-!function() {
+(function() {
 
 	var translations = {
 		empty: '-all-',
@@ -50,4 +50,4 @@
 
 	Polymer.atI18nLocales.add('at-form-cron', 'en', translations);
 
-}();
+}());

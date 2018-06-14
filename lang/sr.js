@@ -1,4 +1,4 @@
-!function() {
+(function() {
 
 	var translations = {
 		empty: '-svi-',
@@ -49,4 +49,4 @@
 
 	Polymer.atI18nLocales.add('at-form-cron', 'sr', translations);
 
-}();
+}());
